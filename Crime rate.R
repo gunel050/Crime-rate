@@ -127,7 +127,7 @@ while(model@model$coefficients_table %>%
   train_h2o <- train %>% as.data.frame() %>% select(target,features) %>% as.h2o()
   test_h2o <- test %>% as.data.frame() %>% select(target,features) %>% as.h2o()
   #burda yaradilan yeni train datasini, asagida yeniden qurulan modelde nezere almaq lazimdir
-  
+# cunki backward elimination datadan bezi deyisenleri cixir ve data yenilenir  
   model <- h2o.glm(
     x = features, y = target,
     training_frame = train_h2o,
