@@ -126,11 +126,12 @@ while(model@model$coefficients_table %>%
   
   train_h2o <- train %>% as.data.frame() %>% select(target,features) %>% as.h2o()
   test_h2o <- test %>% as.data.frame() %>% select(target,features) %>% as.h2o()
-  
+  #burda yaradilan yeni train datasini, asagida yeniden qurulan modelde nezere almaq lazimdir
+# cunki backward elimination datadan bezi deyisenleri cixir ve data yenilenir  
   model <- h2o.glm(
     x = features, y = target,
-    training_frame = train,
-    validation_frame = test,
+    training_frame = train_h2o,
+    validation_frame = test_h2o,
     nfolds = 10, seed = 123,
     lambda = 0, compute_p_values = T)
 }
@@ -140,10 +141,10 @@ model@model$coefficients_table %>%
   dplyr::select(names,p_value) %>%
   mutate(p_value = round(p_value,3)) 
 
-y_pred <- model %>% h2o.predict(newdata = test) %>% as.data.frame()
+y_pred <- model %>% h2o.predict(newdata = test_h2o) %>% as.data.frame()
 y_pred$predict
 
-test_set <- test %>% as.data.frame()
+test_set <- test_h2o %>% as.data.frame()
 residuals = test_set$ViolentCrimesPerPop - y_pred$predict
 
 RMSE = sqrt(mean(residuals^2))
@@ -180,9 +181,9 @@ g %>% ggplotly()
 
 
 
-y_pred_train <- model %>% h2o.predict(newdata = train) %>% as.data.frame()
+y_pred_train <- model %>% h2o.predict(newdata = train_h2o) %>% as.data.frame()
 
-train_set <- train %>% as.data.frame()
+train_set <- train_h2o %>% as.data.frame()
 residuals = train_set$ViolentCrimesPerPop - y_pred_train$predict
 
 RMSE_train = sqrt(mean(residuals^2))
